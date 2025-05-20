@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SpaceV - Roblox Script Executor</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Roboto:wght@300;400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles in addition to Tailwind CSS */
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #0a0a0a; /* Very dark background for the page */
+            color: #e0e0e0; /* Light grey text for general text */
+            margin: 0; /* Remove default body margin */
+            padding-top: 60px; /* Add padding to body to offset fixed navbar */
+        }
+
+        /* Toolbar Styling */
+        .toolbar {
+            background-color: #111116; /* Dark background for toolbar */
+            border-bottom: 2px solid #c070ff; /* Purple accent line */
+            padding: 0 1rem;
+            position: fixed; /* Stick to the top */
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000; /* Ensure it's above other content */
+            height: 60px; /* Fixed height for the toolbar */
+            display: flex;
+            align-items: center;
+        }
+
+        .toolbar-nav {
+            display: flex;
+            justify-content: center; /* Center navigation items */
+            align-items: center;
+            width: 100%;
+            gap: 10px; /* Spacing between nav items */
+        }
+
+        .toolbar-nav a {
+            font-family: 'Orbitron', sans-serif;
+            color: #d1d5db; /* Light grey for nav links */
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            font-size: 0.9rem;
+            white-space: nowrap; /* Prevent wrapping of nav items */
+        }
+
+        .toolbar-nav a:hover,
+        .toolbar-nav a.active {
+            background-color: #c070ff; /* Purple background for active/hover link */
+            color: white;
+        }
+
+        .hero-section {
+            background: linear-gradient(135deg, #1a001a 0%, #2a003a 30%, #4a006a 70%, #000000 100%);
+            background-size: 400% 400%;
+            animation: spaceBackground 20s ease infinite;
+            min-height: calc(100vh - 60px); /* Adjust min-height to account for fixed navbar */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 20px;
+            overflow: hidden;
+            position: relative; /* For stars */
+        }
+
+        @keyframes spaceBackground {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .hero-title {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 3.5rem; /* Adjusted for potentially less vertical space */
+            font-weight: 900;
+            color: #c070ff;
+            text-shadow: 0 0 10px #c070ff, 0 0 20px #c070ff, 0 0 30px #c070ff, 0 0 5px #ffffff;
+            margin-bottom: 0.5rem;
+            animation: fadeInDown 1s ease-out;
+        }
+
+        .hero-subtitle {
+            font-size: 1.3rem; /* Adjusted */
+            color: #d1d5db;
+            margin-bottom: 1rem; /* Adjusted margin */
+            animation: fadeInUp 1s ease-out 0.5s;
+            animation-fill-mode: backwards;
+            max-width: 700px; /* Constrain width for better readability */
+        }
+        .hero-tech-intro {
+            font-size: 1rem;
+            color: #b0b0b0; /* Slightly dimmer than subtitle */
+            margin-bottom: 1rem; /* Adjusted margin */
+            animation: fadeInUp 1s ease-out 0.8s; /* Slightly delayed animation */
+            animation-fill-mode: backwards;
+            max-width: 680px; /* Adjusted max-width */
+            line-height: 1.6;
+        }
+        .hero-setup-note {
+            font-size: 0.9rem;
+            color: #a093c7; /* A lighter, distinct purple-ish tone for the note */
+            margin-bottom: 0.75rem; /* Adjusted margin */
+            animation: fadeInUp 1s ease-out 1.1s; 
+            animation-fill-mode: backwards;
+            max-width: 650px;
+            line-height: 1.5;
+            border: 1px dashed #5f3799; 
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+            background-color: rgba(30, 0, 60, 0.3); 
+        }
+        .hero-development-note {
+            font-size: 0.85rem;
+            color: #9ca3af; /* Tailwind gray-400 */
+            margin-bottom: 1rem; /* Space before buttons */
+            animation: fadeInUp 1s ease-out 1.25s; /* Delayed animation */
+            animation-fill-mode: backwards;
+            max-width: 650px;
+        }
+
+
+        .hero-buttons-container {
+            margin-top: 1rem;
+            display: flex;
+            flex-direction: column; /* Stack main CTA and secondary buttons */
+            align-items: center;
+            gap: 0.75rem; /* Space between button groups */
+            animation: fadeInUp 1s ease-out 1.4s; /* Delay animation for the whole container */
+            animation-fill-mode: backwards;
+        }
+
+        .secondary-buttons-group {
+            display: flex;
+            gap: 0.75rem; /* Space between secondary buttons */
+            flex-wrap: wrap; /* Allow wrapping on small screens */
+            justify-content: center;
+        }
+
+        .cta-button {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(to right, #7f00ff, #c070ff);
+            color: white;
+            padding: 0.85rem 2.25rem;
+            border-radius: 50px;
+            text-decoration: none;
+            font-size: 1.2rem;
+            font-weight: bold;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 20px rgba(127, 0, 255, 0.6);
+            display: inline-block;
+            cursor: pointer; /* Default cursor for buttons */
+        }
+        .cta-button.main-cta { /* Main "Learn More" button */
+             animation: pulse 2s infinite ease-in-out 1.8s; 
+        }
+
+        .cta-button.secondary-cta { /* For DNS and Certificate buttons */
+            background: transparent;
+            border: 2px solid #c070ff;
+            color: #c070ff;
+            font-size: 0.9rem;
+            padding: 0.6rem 1.2rem;
+            box-shadow: none;
+        }
+        .cta-button.secondary-cta:hover:not(.in-progress) { /* Only apply hover if not in-progress */
+            background-color: rgba(192, 112, 255, 0.2); 
+            color: white;
+            box-shadow: 0 0 15px rgba(192, 112, 255, 0.5);
+        }
+
+        .cta-button.download-button { 
+            margin-top: 1.5rem;
+        }
+
+        .cta-button:hover:not(.in-progress) { /* Only apply hover if not in-progress */
+            transform: translateY(-4px) scale(1.07);
+            box-shadow: 0 10px 30px rgba(127, 0, 255, 0.8);
+        }
+        .cta-button.secondary-cta:hover:not(.in-progress) {
+             box-shadow: 0 0 15px rgba(192, 112, 255, 0.5);
+        }
+
+        .cta-button.in-progress {
+            background: linear-gradient(to right, #52525b, #71717a); /* Tailwind zinc-600 to zinc-500 */
+            color: #a1a1aa; /* Tailwind zinc-400 */
+            cursor: not-allowed;
+            box-shadow: none;
+            transform: none !important; /* Disable hover transform */
+        }
+        .cta-button.in-progress:hover { /* Override hover for in-progress */
+            background: linear-gradient(to right, #52525b, #71717a);
+            color: #a1a1aa;
+            box-shadow: none;
+        }
+        .cta-button.secondary-cta.in-progress { /* Specific in-progress for secondary */
+            border-color: #52525b;
+            color: #71717a;
+            background: transparent;
+        }
+         .cta-button.secondary-cta.in-progress:hover {
+            background: transparent;
+            color: #71717a;
+        }
+
+
+        /* Stars */
+        .stars { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; overflow: hidden; }
+        .star { position: absolute; background-color: white; border-radius: 50%; animation: twinkle 5s infinite ease-in-out; }
+
+        /* Keyframes */
+        @keyframes fadeInDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+        @keyframes twinkle { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        /* Content Section Styling (for "All About" and platform pages) */
+        .page-content {
+            display: none; /* Hidden by default, shown by JS */
+            background-color: #111116;
+            padding: 3rem 1.5rem;
+            text-align: left;
+            min-height: calc(100vh - 100px); /* Ensure it takes up space, footer visible */
+        }
+        .page-content.active {
+            display: block; /* Show active page */
+        }
+
+        .page-content h2 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            color: #c070ff;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            text-shadow: 0 0 8px rgba(192, 112, 255, 0.7);
+        }
+
+        .page-content h3 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.5rem;
+            color: #ab47bc; /* Lighter purple for sub-headings */
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            border-bottom: 1px solid #ab47bc;
+            padding-bottom: 0.5rem;
+        }
+
+        .page-content p, .page-content ul {
+            font-size: 1rem;
+            line-height: 1.7;
+            color: #cccccc; /* Slightly lighter grey for body text */
+            margin-bottom: 1rem;
+        }
+
+        .page-content ul {
+            list-style: none; /* Remove default bullets */
+            padding-left: 0;
+        }
+
+        .page-content ul li {
+            background-color: rgba(192, 112, 255, 0.05); /* Very subtle purple tint for list items */
+            margin-bottom: 0.75rem;
+            padding: 0.75rem 1rem;
+            border-left: 3px solid #c070ff; /* Purple accent line */
+            border-radius: 4px;
+            transition: background-color 0.3s ease;
+        }
+        .page-content ul li:hover {
+            background-color: rgba(192, 112, 255, 0.1);
+        }
+
+        .page-content strong {
+            color: #e0e0e0; /* Brighter for emphasis */
+            font-weight: 700; /* Ensure strong is bold */
+        }
+
+        /* Footer Styling */
+        .footer {
+            background-color: #000000; /* Pure black footer */
+            color: #6b7280; /* Tailwind gray-500 */
+            text-align: center;
+            padding: 2rem 1rem; /* More padding */
+            border-top: 1px solid #374151; /* Tailwind gray-700 border */
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            body { padding-top: 100px; /* Adjust for wrapped navbar items if they wrap */ }
+            .toolbar { height: auto; min-height: 60px; } /* Allow toolbar to grow if items wrap */
+            .toolbar-nav { flex-wrap: wrap; justify-content: space-around; padding: 0.5rem 0;}
+            .toolbar-nav a { font-size: 0.8rem; padding: 0.4rem 0.6rem;}
+
+            .hero-title { font-size: 2.5rem; }
+            .hero-subtitle { font-size: 1.1rem; }
+            .hero-tech-intro { font-size: 0.9rem; }
+            .hero-setup-note { font-size: 0.85rem; padding: 0.4rem 0.8rem;}
+            .hero-development-note { font-size: 0.8rem; }
+            .cta-button { padding: 0.7rem 1.8rem; font-size: 1.1rem; }
+            .cta-button.secondary-cta { font-size: 0.8rem; padding: 0.5rem 1rem; }
+            .page-content h2 { font-size: 1.8rem; }
+            .page-content h3 { font-size: 1.3rem; }
+            .page-content { padding: 2rem 1rem; }
+        }
+         @media (max-width: 480px) {
+            .hero-title { font-size: 2rem; }
+            .hero-subtitle { font-size: 1rem; }
+            .hero-tech-intro { font-size: 0.85rem; }
+            .hero-setup-note { font-size: 0.8rem; }
+            .hero-development-note { font-size: 0.75rem; }
+            .secondary-buttons-group { flex-direction: column; align-items: center; } /* Stack secondary buttons on very small screens */
+            .cta-button.secondary-cta { width: 80%; text-align: center; } /* Make secondary buttons take more width */
+
+         }
+    </style>
+</head>
+<body>
+    <header class="toolbar">
+        <nav class="toolbar-nav">
+            <a href="#home" class="nav-link active">Home</a>
+            <a href="#about" class="nav-link">All About SpaceV</a>
+            <a href="#windows" class="nav-link">Windows</a>
+            <a href="#macos" class="nav-link">MacOS</a>
+            <a href="#android" class="nav-link">Android</a>
+            <a href="#ios" class="nav-link">iOS</a>
+        </nav>
+    </header>
+
+    <main>
+        <section id="home-content" class="hero-section page-content active">
+            <div class="stars" id="stars-container">
+                </div>
+            <div class="relative z-10"> <h1 class="hero-title">SpaceV</h1>
+                <p class="hero-subtitle">
+                    Welcome to SpaceV, your ultimate gateway to unlocking the vast cosmos of Roblox scripting possibilities.
+                    Experience unparalleled power, stability, and a user-friendly interface designed for scripters of all levels.
+                </p>
+                <p class="hero-tech-intro">
+                    Powered by an advanced architecture featuring our 'Nebula Engine,' GPU acceleration, and optimized network capabilities.
+                    SpaceV is enhanced by our integrated AI, <strong>Gemini</strong>, for smart assistance, intuitive built-in system settings for full control,
+                    and incorporates advanced anti-detection measures for a more secure experience.
+                </p>
+                <p class="hero-setup-note">
+                    <strong>Important Setup:</strong> For optimal performance and security, ensure you download and install the SpaceV certificate and configure the recommended DNS profile. Details are provided in the installation guide.
+                </p>
+                <p class="hero-development-note">
+                    <em>Please note: Our dedicated server infrastructure for enhanced cloud features is currently under active development.</em>
+                </p>
+                <div class="hero-buttons-container">
+                    <div class="secondary-buttons-group">
+                        <a href="#" class="cta-button secondary-cta in-progress">DNS Profile (In Progress...)</a>
+                        <a href="#" class="cta-button secondary-cta in-progress">Certificate (In Progress...)</a>
+                    </div>
+                    <a href="#about" class="cta-button main-cta learn-more-btn">Learn More about SpaceV</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="about-content" class="page-content">
+            <div class="container mx-auto px-4">
+                <h2>Discover the Power of SpaceV</h2>
+
+                <h3>Why SpaceV is the Premier Roblox Executor</h3>
+                <p>SpaceV isn't just another script executor; it's a meticulously engineered tool designed to provide the most <strong>stable, powerful, and user-friendly</strong> scripting experience in the Roblox universe. We prioritize cutting-edge technology with a focus on security and performance, ensuring you can explore new gameplay dimensions without compromise. Our dedicated team is constantly innovating, pushing the boundaries of what's possible and responding to community feedback to make SpaceV the undisputed leader.</p>
+                <ul>
+                    <li><strong>Unmatched Stability:</strong> Say goodbye to frequent crashes. SpaceV's robust architecture ensures your scripts run smoothly, letting you focus on the fun.</li>
+                    <li><strong>Blazing Fast Execution:</strong> Experience minimal lag and maximum efficiency with our optimized execution engine, capable of handling even the most demanding scripts.</li>
+                    <li><strong>Intuitive User Interface:</strong> Our sleek, modern interface, themed in our signature purple and black, is designed for ease of use, whether you're a seasoned scripter or just starting out.</li>
+                    <li><strong>Cross-Platform Supremacy:</strong> Unlike many competitors, SpaceV offers extensive compatibility, bringing its powerful features to Windows, MacOS, Android, and iOS users.</li>
+                    <li><strong>Dedicated Support & Community:</strong> Join a thriving community and get assistance from our responsive support team, ensuring you're never left in the dark.</li>
+                </ul>
+
+                <h3>Key Features of SpaceV</h3>
+                <p>SpaceV is packed with features designed to elevate your Roblox scripting to new heights. We've listened to the community and integrated the tools you need for a seamless and powerful experience:</p>
+                <ul>
+                    <li><strong>Advanced Script Execution Core:</strong> Supports a vast library of scripts with high compatibility and performance. Execute Lua scripts with precision and speed.</li>
+                    <li><strong>Integrated AI (Gemini):</strong> Benefit from smart script suggestions, code completion assistance, and performance optimization tips powered by our cutting-edge Gemini AI.</li>
+                    <li><strong>Multi-API Support:</strong> Enhanced compatibility with various scripting APIs, giving you more flexibility and power.</li>
+                    <li><strong>Sleek & Customizable UI:</strong> Enjoy our signature purple and black aesthetic, with comprehensive built-in system settings to tailor themes, transparency, and layout options to create your perfect scripting environment.</li>
+                    <li><strong>Built-in Script Hub (Planned):</strong> Soon, you'll be able to access a curated library of popular and verified scripts directly within SpaceV, simplifying discovery and execution. Our server-side infrastructure for this and other cloud features is currently in development.</li>
+                    <li><strong>Regular Updates & Advanced Anti-Detection:</strong> We are committed to continuous improvement, providing frequent updates with new features, security patches, performance enhancements, and robust anti-detection measures to safeguard your experience. This includes guidance on secure setup, such as certificate installation and DNS profile configuration.</li>
+                    <li><strong>Cross-Platform Availability:</strong> Use SpaceV on your preferred device, whether it's Windows, MacOS, Android, or iOS. Your scripts, your way, on your platform.</li>
+                    <li><strong>Script Management Tools:</strong> Easily load, save, and manage your scripts within the executor. Features like auto-execute and script scheduling are on our roadmap.</li>
+                    <li><strong>Developer Console & Debugging:</strong> Advanced tools for script developers to test and debug their creations directly within SpaceV.</li>
+                    <li><strong>Lightweight & Efficient:</strong> Designed to be resource-friendly, ensuring SpaceV doesn't bog down your system while you play.</li>
+                </ul>
+
+                <h3>Our Commitment to Security & Updates</h3>
+                <p>Your safety and a consistently improving experience are paramount at SpaceV. We understand the concerns surrounding script execution and are dedicated to providing a secure and reliable platform. Part of this commitment involves ensuring a secure operational environment, which may include specific setup steps like installing the SpaceV certificate and configuring a DNS profile as detailed in our guides.</p>
+                <ul>
+                    <li><strong>Proactive Threat Mitigation:</strong> Our security team continuously monitors for emerging threats and updates our protection layers to stay ahead. This includes advanced obfuscation techniques and anti-tampering mechanisms as part of our comprehensive anti-detection system.</li>
+                    <li><strong>Regular Security Audits:</strong> SpaceV undergoes periodic internal and external security assessments to identify and address potential vulnerabilities.</li>
+                    <li><strong>Frequent Update Cycle:</strong> We release updates regularly – not just for new features, but critically for security patches and compatibility improvements with the latest Roblox versions. Expect seamless auto-updates or clear notifications for manual updates.</li>
+                    <li><strong>Transparent Communication:</strong> While we can't divulge all our security secrets, we believe in transparently communicating about significant updates and any potential security advisories to our user base.</li>
+                    <li><strong>User-Controlled Permissions (Future):</strong> We are exploring granular permission controls for scripts, allowing users to define what capabilities a script can access, adding an extra layer of user-defined security.</li>
+                </ul>
+
+                <h3>Advanced Technical Architecture</h3>
+                <p>SpaceV is built on a sophisticated technical foundation designed for performance, flexibility, and future-proofing across multiple platforms. Our architecture leverages modern technologies to deliver a superior scripting experience. We are also actively developing our dedicated server infrastructure to support upcoming cloud-based features and enhance overall service delivery.</p>
+                <ul>
+                    <li><strong>Optimized Cross-Platform Rendering Engine ('Nebula Engine'):</strong> Our custom rendering solution ensures that SpaceV's UI and script-injected elements perform optimally across Windows, MacOS, Android, and iOS, adapting to each platform's native capabilities for a smooth experience.</li>
+                    <li><strong>Hardware-Accelerated GPU Processing:</strong> Where available, SpaceV intelligently offloads complex rendering tasks and script-related computations to the device's GPU. This significantly boosts performance for graphically intensive scripts and ensures the main CPU thread remains responsive.</li>
+                    <li><strong>Intelligent Network Management & DNS Optimization:</strong> SpaceV incorporates smart network protocols for fetching script updates, community content, and performing version checks. This includes optimized DNS resolution pathways and resilient connection handling to ensure reliability. The recommended DNS profile aids in this secure and efficient communication.</li>
+                    <li><strong>Modular Core Services:</strong> The core functionalities of SpaceV, such as script injection, execution, and UI management, are built as modular services. This allows for easier updates, better stability, and more efficient resource utilization.</li>
+                    <li><strong>Dynamic Resource Allocation:</strong> SpaceV dynamically manages system resources like memory and CPU cycles, ensuring it remains lightweight and doesn't excessively drain your device's battery or impact overall system performance.</li>
+                </ul>
+
+                <div class="text-center mt-8">
+                     <a href="#" class="cta-button in-progress">Download SpaceV (In Progress...)</a>
+                     <p class="text-sm text-gray-400 mt-2">(Select your platform from the navigation bar above for specific download links)</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="windows-content" class="page-content">
+            <div class="container mx-auto px-4 text-center">
+                <h2>SpaceV for Windows</h2>
+                <img src="https://placehold.co/150x150/7f00ff/FFFFFF?text=Win" alt="Windows Logo Placeholder" class="mx-auto mb-4 rounded-lg shadow-lg">
+                <p class="mt-4 text-xl">Unleash the full potential of Roblox scripting on your Windows PC with SpaceV. Optimized for performance, stability, and a rich feature set.</p>
+                <p class="mt-2">Get the best scripting experience with our dedicated Windows build, offering seamless integration and powerful tools. Remember to follow the installation guide for certificate and DNS profile setup.</p>
+                 <div class="text-center mt-8">
+                     <a href="#" class="cta-button download-button in-progress">Windows Download (In Progress...)</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="macos-content" class="page-content">
+            <div class="container mx-auto px-4 text-center">
+                <h2>SpaceV for MacOS</h2>
+                <img src="https://placehold.co/150x150/c070ff/FFFFFF?text=Mac" alt="MacOS Logo Placeholder" class="mx-auto mb-4 rounded-lg shadow-lg">
+                <p class="mt-4 text-xl">Experience seamless Roblox scripting on your Mac with SpaceV. Sleek, powerful, and integrated with the MacOS environment.</p>
+                <p class="mt-2">Our dedicated MacOS version is ready to elevate your scripting. Download now and explore the possibilities! Ensure to check the setup guide for certificate and DNS profile details.</p>
+                 <div class="text-center mt-8">
+                     <a href="#" class="cta-button download-button in-progress">MacOS Download (In Progress...)</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="android-content" class="page-content">
+            <div class="container mx-auto px-4 text-center">
+                <h2>SpaceV for Android</h2>
+                <img src="https://placehold.co/150x150/7f00ff/FFFFFF?text=Droid" alt="Android Logo Placeholder" class="mx-auto mb-4 rounded-lg shadow-lg">
+                <p class="mt-4 text-xl">Take your Roblox scripts on the go with SpaceV for Android. Full-featured execution in the palm of your hand.</p>
+                <p class="mt-2">The official Android release of SpaceV is here! Enjoy powerful scripting anytime, anywhere. Follow setup instructions for certificate and DNS profile installation.</p>
+                 <div class="text-center mt-8">
+                     <a href="#" class="cta-button download-button in-progress">Android Download (In Progress...)</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="ios-content" class="page-content">
+            <div class="container mx-auto px-4 text-center">
+                <h2>SpaceV for iOS</h2>
+                <img src="https://placehold.co/150x150/c070ff/FFFFFF?text=iOS" alt="iOS Logo Placeholder" class="mx-auto mb-4 rounded-lg shadow-lg">
+                <p class="mt-4 text-xl">SpaceV is bringing its powerful scripting capabilities to iOS devices. Elevate your Roblox experience on iPhone and iPad.</p>
+                <p class="mt-2">Unlock a new dimension of scripting on your iOS device with the official SpaceV release. Please refer to our guide for certificate and DNS profile setup.</p>
+                 <div class="text-center mt-8">
+                     <a href="#" class="cta-button download-button in-progress">iOS Download (In Progress...)</a>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <p>&copy; 2025 SpaceV. Not affiliated with Roblox Corporation. Use Responsibly.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Starfield generation
+            const starsContainer = document.getElementById('stars-container');
+            if (starsContainer) {
+                const numberOfStars = 100; // Reduced for hero section
+                for (let i = 0; i < numberOfStars; i++) {
+                    let star = document.createElement('div');
+                    star.classList.add('star');
+                    star.style.width = `${Math.random() * 2 + 1}px`;
+                    star.style.height = star.style.width;
+                    star.style.left = `${Math.random() * 100}%`;
+                    star.style.top = `${Math.random() * 100}%`;
+                    star.style.animationDelay = `${Math.random() * 5}s`;
+                    star.style.opacity = `${Math.random() * 0.5 + 0.2}`;
+                    starsContainer.appendChild(star);
+                }
+            }
+
+            // Navigation handling
+            const navLinks = document.querySelectorAll('.nav-link');
+            const pageContents = document.querySelectorAll('.page-content');
+            const learnMoreButton = document.querySelector('.learn-more-btn');
+
+            function showPage(pageId) {
+                pageContents.forEach(content => {
+                    content.classList.remove('active');
+                });
+                navLinks.forEach(link => {
+                    link.classList.remove('active');
+                });
+
+                const targetPage = document.getElementById(pageId + '-content');
+                const targetLink = document.querySelector(`.nav-link[href="#${pageId}"]`);
+
+                if (targetPage) {
+                    targetPage.classList.add('active');
+                }
+                if (targetLink) {
+                    targetLink.classList.add('active');
+                }
+                window.scrollTo(0, 0); // Scroll to top when changing pages
+            }
+
+            navLinks.forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.getAttribute('href').substring(1);
+                    showPage(pageId);
+                    // Update URL hash for bookmarking/history
+                     if(history.pushState) {
+                        history.pushState(null, null, '#' + pageId);
+                    } else {
+                        window.location.hash = '#' + pageId;
+                    }
+                });
+            });
+
+            if (learnMoreButton) {
+                learnMoreButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const pageId = this.getAttribute('href').substring(1);
+                    showPage(pageId);
+                     if(history.pushState) {
+                        history.pushState(null, null, '#' + pageId);
+                    } else {
+                        window.location.hash = '#' + pageId;
+                    }
+                });
+            }
+
+            // Handle initial page load based on hash or default to home
+            let initialPage = 'home'; // Default to home
+            if (window.location.hash) {
+                const hashPage = window.location.hash.substring(1);
+                const validPageIds = Array.from(navLinks).map(link => link.getAttribute('href').substring(1));
+                if (validPageIds.includes(hashPage)) {
+                    initialPage = hashPage;
+                }
+            }
+            showPage(initialPage);
+
+            // Update active page on browser back/forward
+            window.addEventListener('popstate', function() {
+                let hashPage = 'home';
+                if (window.location.hash) {
+                    const currentHash = window.location.hash.substring(1);
+                    const validPageIds = Array.from(navLinks).map(link => link.getAttribute('href').substring(1));
+                     if (validPageIds.includes(currentHash)) {
+                        hashPage = currentHash;
+                    }
+                }
+                showPage(hashPage);
+            });
+
+            // Prevent default action for in-progress buttons
+            const inProgressButtons = document.querySelectorAll('.in-progress');
+            inProgressButtons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.preventDefault(); // Prevent navigation or any default action
+                });
+            });
+        });
+    </script>
+</body>
+</html>
